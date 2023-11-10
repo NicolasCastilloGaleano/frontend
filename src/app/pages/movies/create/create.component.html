@@ -1,1 +1,73 @@
-<p>create works!</p>
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+
+</div>
+<!-- Page content -->
+<div class="container-fluid mt--7">
+    <!-- Table -->
+    <div class="row">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header border-0">
+                    <h3 *ngIf="creationMode" class="mb-0">Crear Película</h3>
+                    <h3 *ngIf="!creationMode" class="mb-0">Actualizar Película</h3>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="formGroupValidator">
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Nombre:</label>
+                            </div>
+                            <div class="col-9">
+                                <input class="form-control" type="text" formControlName="name">
+                                <div
+                                    *ngIf="formGroupValidatorData.name.errors && (formGroupValidatorData.name.dirty || formGroupValidatorData.name.touched)">
+                                    <strong *ngIf="formGroupValidatorData.name.errors.required">Campo requerido</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Duración:</label>
+                            </div>
+                            <div class="col-9">
+                                <input class="form-control" type="number" formControlName="duration">
+                                <div
+                                    *ngIf="formGroupValidatorData.duration.errors && (formGroupValidatorData.duration.dirty || formGroupValidatorData.duration.touched)">
+                                    <strong *ngIf="formGroupValidatorData.duration.errors.required">Campo
+                                        requerido</strong>
+                                    <strong *ngIf="formGroupValidatorData.duration.errors.min">El valor debe ser
+                                        superior a 0</strong>
+                                    <strong *ngIf="formGroupValidatorData.duration.errors.max">El valor debe ser
+                                        inferior a 300</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-3">
+                                <label>Año:</label>
+                            </div>
+                            <div class="col-9">
+                                <input class="form-control" type="date" formControlName="year">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-3">
+
+                            </div>
+                            <div class="col-9">
+                                <button *ngIf="creationMode" type="button" class="btn btn-primary btn-block"
+                                    (click)="create()">Crear</button>
+                                <button *ngIf="!creationMode" type="button" class="btn btn-primary btn-block"
+                                    (click)="update()">Actualizar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
