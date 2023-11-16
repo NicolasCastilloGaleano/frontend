@@ -8,8 +8,10 @@
         <div class="col">
             <div class="card shadow">
                 <div class="card-header border-0">
-                    <h3 *ngIf="creationMode" class="mb-0">Crear Película</h3>
-                    <h3 *ngIf="!creationMode" class="mb-0">Actualizar Película</h3>
+                    <h3 *ngIf="creationMode; else nothing" class="mb-0">Crear Película</h3>
+                    <ng-template #nothing>
+                        <h3 class="mb-0">Actualizar Película</h3>
+                    </ng-template>
                 </div>
                 <div class="card-body">
                     <form [formGroup]="formGroupValidator">

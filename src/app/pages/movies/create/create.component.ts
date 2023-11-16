@@ -30,13 +30,13 @@ export class CreateComponent implements OnInit {
   }
   formBuilding() {
     this.formGroupValidator = this.formBuilder.group({
-      name: ["", [Validators.required]],
+      name: [this.movie.name || "", [Validators.required]],
       duration: [
-        "",
+        this.movie.duration || "",
         [Validators.min(1), Validators.max(300), Validators.required],
       ],
       year: [
-        "",
+        this.movie.year || "",
         [
           Validators.required,
           Validators.pattern(
@@ -64,20 +64,21 @@ export class CreateComponent implements OnInit {
       this.show(this.rutaActiva.snapshot.params.id);
     }
   }
-  show(id: number) {
-    this.moviesService.show(id).subscribe((jsonResponse: any) => {
-      this.movie = jsonResponse;
+  show(id: number): void {
+    this.moviesService.show(id).subscribe((response: Movie) => {
+      this.movie = response;
       this.movie.year = this.transformatDate(this.movie.year);
+      this.formBuilding();
     });
   }
-  create() {
+  create(): void {
     if (this.formGroupValidator.invalid) {
       Swal.fire({
         title: "Formulario Incorrecto",
         icon: "error",
         timer: 3000,
       });
-      return false;
+      return;
     }
     this.movie = this.movieData();
     console.log("Creando a " + JSON.stringify(this.movie));
