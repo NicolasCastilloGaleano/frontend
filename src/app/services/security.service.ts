@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { User } from "../models/user.model";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 
@@ -41,11 +41,9 @@ export class SecurityService {
    * @param infoUsuario JSON con la información de correo y contraseña
    * @returns Respuesta HTTP la cual indica si el usuario tiene permiso de acceso
    */
-  login(infoUsuario: User): Observable<User> {
-    return this.http.post<User>(
-      `${environment.url_ms_security}/security/login`,
-      infoUsuario
-    );
+  login(theUser: User):Observable<any>{
+    let headers = new HttpHeaders();
+    return this.http.post<string>(`${environment.url_ms_security}/api/public/security/login`, theUser, { headers, responseType: 'text' as 'json' } );
   }
   /**
    * Guarda los datos tales como el identificador
@@ -55,18 +53,15 @@ export class SecurityService {
    * @returns un booleano que indica si la información
    * fue almacenada correctamente
    */
-  saveSessionData(sessionData: any) {
+  saveSessionData(userData: User) {
     let actualSession = localStorage.getItem("session");
     if (actualSession) {
+      return false
     } else {
+      localStorage.setItem("session", JSON.stringify(userData));
+      this.setUser(userData);
+      return true
     }
-
-    let data: User = {
-      _id: sessionData["_id"],
-      token: sessionData["token"],
-    };
-    localStorage.setItem("session", JSON.stringify(data));
-    this.setUser(data);
   }
   /**
    * Permite cerrar la sesión del usuario
@@ -99,5 +94,11 @@ export class SecurityService {
     if (theSession) {
       this.setUser(JSON.parse(theSession));
     }
+  }
+
+  getUserFromToken(token: string):Observable<User>{
+    let headers = new HttpHeaders().set('Content-Type', 'application/json')
+                                   .set('Authorization', `Bearer ${token}`);
+    return this.http.get<User>(`${environment.url_ms_security}/api/public/security/token-validation`, { headers });
   }
 }

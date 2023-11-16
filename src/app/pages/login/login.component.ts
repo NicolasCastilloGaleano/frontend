@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { User } from "src/app/models/user.model";
+import { SecurityService } from "src/app/services/security.service";
 import Swal from "sweetalert2";
 
 @Component({
@@ -11,7 +12,7 @@ import Swal from "sweetalert2";
 })
 export class LoginComponent implements OnInit, OnDestroy {
   formGroupValidator: FormGroup;
-  constructor(private router: Router, private formBuilder: FormBuilder) {}
+  constructor(private router: Router, private formBuilder: FormBuilder, private service: SecurityService) {}
 
   ngOnInit() {
     this.formBuilding();
@@ -36,26 +37,52 @@ export class LoginComponent implements OnInit, OnDestroy {
     theUser.password = this.formGroupValidatorData.password.value;
     return theUser;
   }
-  login(): void {
+  login() {
     if (this.formGroupValidator.invalid) {
       Swal.fire({
-        title: "Formulario Incorrecto",
-        icon: "error",
-        timer: 3000,
+        title: 'Formulario Incorrecto',
+        icon: 'error',
+        timer: 3000
       });
-      return;
+      return false;
     }
-    let user: User = this.UserData();
-
-    // this.movie = this.movieData();
-    // console.log("Creando a " + JSON.stringify(this.movie));
-    // this.moviesService.create(this.movie).subscribe((jsonResponse: any) => {
-    //   Swal.fire({
-    //     title: "Creado",
-    //     icon: "success",
-    //   });
-    //   this.router.navigate(["movies/list"]);
-    // });
+    let user = this.UserData()
+    this.service.login(user).subscribe({
+      next: (data) => {
+        console.log("llamando")
+        console.log("resultado del login " + data)
+        this.getUserFromToken(data)
+        
+        this.getUserFromToken(data)
+        this.router.navigate(['pages/dashboard']);
+        this.service.saveSessionData(data);
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'Usuario o contraseña inválido',
+          icon: 'error',
+          timer: 5000
+        });
+      }
+    }
+    );
   }
+  getUserFromToken(token: string) {
+    this.service.getUserFromToken(token).subscribe({
+      next:user=>{
+        console.log(user)
+        let finalData={
+          "_id": user["_id"],
+          "name":user["name"],
+          "email":user["email"],
+          token,
+          "role":user["role"]
+        }
+      }
+    })
+  }
+
+ 
   ngOnDestroy() {}
 }
